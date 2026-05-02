@@ -1,0 +1,25 @@
+server {
+    listen 80;
+    root /var/www/html;
+    index index.html;
+    
+    if (!-d $request_filename)
+    {
+        rewrite ^/(.+)/$ /$1 permanent;
+    }
+    
+    if ($host ~* ^www\.(.*))
+    {
+        set $host_without_www $1;
+        rewrite ^/(.*)$ $scheme://$host_without_www/$1 permanent;
+    }
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+        gzip_static on;
+    }
+    
+    location ~ /\.ht {
+        deny all;
+    }
+}

@@ -1,0 +1,39 @@
+services:
+  api:
+    image: ${DOCKER_IMAGE_API}
+    ports:
+      - ${DOCKER_API_PORT}:${API_PORT}
+    depends_on:
+      - oltp
+    environment:
+      OLTP_HOST: ${OLTP_HOST}
+      OLTP_PORT: ${OLTP_PORT}
+      OLTP_USER: ${OLTP_USER}
+      OLTP_PASSWORD: ${OLTP_PASSWORD}
+      OLTP_DBNAME: ${OLTP_DBNAME}
+    networks:
+      - bumblebee
+  
+  web:
+    image: ${DOCKER_IMAGE_WEB}
+    ports:
+      - ${DOCKER_WEB_PORT}:${WEB_PORT}
+    depends_on:
+      - api
+    networks:
+      - bumblebee
+
+  oltp:
+    image: postgres:18.2
+    restart: always
+    volumes:
+      - oltp:/var/lib/postgresql
+    networks:
+      - bumblebee
+
+volumes:
+  oltp:
+
+networks:
+  bumblebee:
+    driver: bridge

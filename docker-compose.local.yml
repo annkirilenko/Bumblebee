@@ -1,0 +1,28 @@
+services:
+  api:
+    volumes:
+      - ./API:/app/API
+      - ./Application:/app/Application
+      - ./Domain:/app/Domain
+      - ./Infrastructure:/app/Infrastructure
+  
+  web:
+    image: ${DOCKER_IMAGE_WEB}-dev
+    environment:
+      APP_PORT: ${WEB_PORT}
+    volumes:
+      - ./Web:/app
+    command: npm run dev
+
+  oltp:
+    environment:
+      POSTGRES_DB: ${DOCKER_OLTP_ROOT_DBNAME}
+      POSTGRES_USER: ${DOCKER_OLTP_ROOT_USER}
+      POSTGRES_PASSWORD: ${DOCKER_OLTP_ROOT_PASSWORD}
+      POSTGRES_APP_DB: ${OLTP_DBNAME}
+      POSTGRES_APP_USER: ${OLTP_USER}
+      POSTGRES_APP_PASSWORD: ${OLTP_PASSWORD}
+    ports:
+      - ${DOCKER_OLTP_PORT}:${OLTP_PORT}
+    volumes:
+      - ./.docker/postgres/initdb.d:/docker-entrypoint-initdb.d
